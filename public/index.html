@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <meta name="google-signin-client_id" content="YOUR_GOOGLE_CLIENT_ID">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    h2 {
+      color: #333;
+    }
+
+    #login-btn {
+      background-color: #4285F4;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+
+    #login-btn:hover {
+      background-color: #357ae8;
+    }
+
+    .footer {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Login with Google</h2>
+    <button id="login-btn">Login with Google</button>
+    <div class="footer">© 2023 Your Company Name</div>
+  </div>
+
+  <script>
+    let tokenClient;
+
+    window.onload = () => {
+      tokenClient = google.accounts.oauth2.initCodeClient({
+        client_id: '829310964139-lvj6rhq8vlavkf92j7a9hmnaj3bddpcp.apps.googleusercontent.com',
+        scope: 'openid email profile',
+        ux_mode: 'popup',
+        callback: (response) => {
+          console.log("Received auth code:", response.code);
+          // Send code to your backend
+          fetch('/dev/auth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: response.code }),
+          })
+          .then(res => res.json())
+          .then(data => {
+            console.log("Backend auth response:", data);
+            alert("Welcome " + data.user.name);
+            // Optionally store token, redirect, etc.
+          })
+          .catch(err => {
+            console.error("Auth failed:", err);
+            alert("Login failed");
+          });
+        }
+      });
+
+      document.getElementById("login-btn").addEventListener("click", () => {
+        tokenClient.requestCode();
+      });
+    };
+  </script>
+</body>
+</html>
