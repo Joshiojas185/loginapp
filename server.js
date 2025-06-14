@@ -76,9 +76,9 @@ app.post("/dev/auth", async (req, res) => {
 });
 
 // Server Configuration
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 4000;
 const server = http.createServer(app);
 
 server.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  console.log(`Server running on http://localhost:${port}`);
 });

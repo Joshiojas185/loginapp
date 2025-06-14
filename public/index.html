@@ -23,6 +23,7 @@
       border-radius: 8px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       text-align: center;
+      width: 300px;
     }
 
     h2 {
@@ -44,6 +45,12 @@
       background-color: #357ae8;
     }
 
+    #status-message {
+      margin-top: 15px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
     .footer {
       margin-top: 20px;
       font-size: 14px;
@@ -55,6 +62,7 @@
   <div class="container">
     <h2>Login with Google</h2>
     <button id="login-btn">Login with Google</button>
+    <div id="status-message"></div>
     <div class="footer">© 2023 Your Company Name</div>
   </div>
 
@@ -67,8 +75,9 @@
         scope: 'openid email profile',
         ux_mode: 'popup',
         callback: (response) => {
-          console.log("Received auth code:", response.code);
-          // Send code to your backend
+          const statusDiv = document.getElementById("status-message");
+          statusDiv.textContent = "Authenticating...";
+
           fetch('/dev/auth', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -76,13 +85,18 @@
           })
           .then(res => res.json())
           .then(data => {
-            console.log("Backend auth response:", data);
-            alert("Welcome " + data.user.name);
-            // Optionally store token, redirect, etc.
+            if (data && data.user) {
+              statusDiv.textContent = `✅ Successful Authentication. Welcome, ${data.user.name}!`;
+              statusDiv.style.color = "green";
+            } else {
+              statusDiv.textContent = "❌ Unsuccessful Authentication.";
+              statusDiv.style.color = "red";
+            }
           })
           .catch(err => {
             console.error("Auth failed:", err);
-            alert("Login failed");
+            statusDiv.textContent = "❌ Unsuccessful Authentication.";
+            statusDiv.style.color = "red";
           });
         }
       });
